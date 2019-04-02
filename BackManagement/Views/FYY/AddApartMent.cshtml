@@ -1,0 +1,50 @@
+﻿
+@{
+    ViewBag.Title = "添加户型信息";
+    Layout = null;
+}
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+@model List<Model.Apartment>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                @using (Html.BeginForm("AddApartMent", "FYY"))
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">添加户型信息如下👇</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="email">户型名称</label>
+                                <input type="text" class="form-control" name="Apartment_Name" id="A_Id" />
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <button type="submit" class="btn btn-success">添加</button>
+                            <button id="quxiao" onclick="myfunction()" class="btn btn-danger" type="button">取消</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#A_Id").blur(function () {
+        var A_N = $("#A_Id").val();
+        if (A_N == "" || A_N == null || A_N == undefined) {
+            $("#A_Id").text("亲,户型名称不能为空哦！");
+            return false;
+        }
+    })
+
+    function myfunction() {
+        document.getElementById("A_Id").value = "";
+
+    }
+
+</script>
+

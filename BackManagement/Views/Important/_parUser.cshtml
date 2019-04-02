@@ -1,0 +1,124 @@
+﻿
+
+<table class="layui-table">
+    <thead>
+        <tr>
+            <th scope="col">姓名</th>
+            <th scope="col">手机号</th>
+            <th scope="col">付款状态</th>
+            <th scope="col">房子名称</th>
+            <th scope="col">大小</th>
+            <th scope="col">户型(几室几厅)</th>
+            <th scope="col">地址</th>
+            <th scope="col">操作</th>
+        </tr>
+    </thead>
+    <tbody id="tr1" class="layui-table">
+        @foreach (var item in Model)
+        {
+            <tr id="@item.C_Num">
+                <td>@item.U_Name</td>
+                <td>@item.U_Phone</td>
+                <td>@item.Statee</td>
+
+                <td>@item.H_Name</td>
+
+                <td>@item.H_Size</td>
+                <td>@item.H_HomeType</td>
+                <td>@item.H_Address</td>
+                <td>
+                    <button class="btn btn-primary btn-border" data-toggle="modal" data-target="#myModal" onclick="fantian(@item.C_Id)">缴费详情</button>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+    <div class="modal-dialog" style="position:absolute;margin-left:-255px;">
+        <div class="modal-content" style="height:300px; width:500px;">
+            <div style="margin-left:50px">
+                <table id="tablell" class="layui-table" style="margin-left:-15px;">
+                </table>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<script>
+    function fantian(id) {
+        $.ajax({
+            url: "http://localhost:23634/api/Future_k/seleShow/?CID=" + id,
+            dataType: "json",
+            type: "get",
+            success: function (data) {
+                $("#tablell").empty();
+                $(data).each(function () {
+                    if (this.C_State == 1) {
+                        var tr = " <tr>                                           "
+                            + "  <td>姓名:</td>                                   "
+                            + "  <td>" + this.U_Name + "</td>          "
+                            + "  </tr>                                            "
+                            + "   <tr>                                            "
+                            + "   <td></td>                                       "
+                            + "   </tr>                                           "
+                            + "   <tr>                                            "
+                            + "       <td>付款时间:</td>                          "
+                            + "       <td>" + this.C_PayTime + "</td>             "
+                            + "                                                   "
+                            + "   </tr>                                           "
+                            + "   <tr>                                            "
+                            + "       <td></td>                                   "
+                            + "   </tr>                                           "
+                            + "   <tr>                                            "
+                            + "       <td>付款金额:</td>                          "
+                            + "       <td>" + this.C_Price + "元</td>             "
+                            + "   </tr>                                           "
+                            + "   <tr>                                            "
+                            + "       <td></td>                                   "
+                            + "   </tr>                                           "
+                            + "   <tr>                                            "
+                            + "       <td>分期期数:</td>                          "
+                            + "       <td>" + this.C_Num + " 月</td>              "
+                            + "   </tr>                                           "
+                            + "   <tr>                                            "
+                            + "       <td></td>                                   "
+                            + "   </tr>                                           "
+                            + "<tr>"
+                            + "<td>每期应交:</td>"
+                            + "<td>" + this.C_Price / this.C_Num + "元"
+                            + "</td>"
+                            + "</tr>";
+                        $("#tablell").append(tr);
+                    }
+                    else if(this.C_State == 0) {
+                        var tr = "  <tr>"
+                            + " <td>                                                 "
+                            + "     <br />                                           "
+                            + " </td>                                                "
+                            + "                                                      "
+                            + "  </tr>                                               "
+                            + "  <tr>                                                "
+                            + "      <td style='font-size:50px'>全付款</td>          "
+                            + "                                                      "
+                            + "  </tr>                                               "
+                            + "  <tr>                                                "
+                            + "      <td>付款金额</td>                               "
+                            + "      <td>" + this.C_Price + " 元</td>                "
+                            + "  </tr>";
+                        $("#tablell").append(tr);
+                    }
+                    else if (this.C_State == 2) {
+                        var tr = "  <tr>                                            "
+                            + " < td >                                                 "
+                            + " <br />                                                 "
+                            + "     </td >                                             "
+                            + " </tr >                                                 "
+                            + " <tr>                                                   "
+                            + "     <td style='font-size:50px'>未付款</td>             "
+                            + " </tr>";
+                    }
+                  
+                })
+            }
+            })
+    }
+    
+</script>

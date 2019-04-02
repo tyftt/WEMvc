@@ -1,0 +1,20 @@
+﻿<table class="layui-table">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">员工姓名</th>
+            <th scope="col">销量</th>
+        </tr>
+    </thead>
+    <tbody id="tbodyEnterprise">
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td></td>
+            <td>@item.E_Name</td>
+            <td>@item.num</td>
+        </tr>
+        }
+    </tbody>
+</table>
+

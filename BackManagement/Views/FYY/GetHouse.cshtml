@@ -1,0 +1,436 @@
+﻿
+@{
+    ViewBag.Title = "显示楼盘信息";
+    Layout = null;
+}
+
+<script src="~/Style/static/js/jquery-1.10.2.js"></script>
+<script src="~/Style/static/js/bootstrap.js"></script>
+<link href="~/Style/static/css/bootstrap.css" rel="stylesheet" />
+<script src="~/Style/lib/layui/layui.all.js"></script>
+<link href="~/Style/lib/layui/css/layui.css" rel="stylesheet" />
+<link href="~/Style/lib/layui/css/layui.mobile.css" rel="stylesheet" />
+<script src="~/Style/lib/layui/layui.js"></script>
+@using Model;
+@model List<Model.HouseInfo>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div>
+                        <input type="text" style="width:400px; display:inline-block" class="form-control" id="serachs" name="Name" placeholder="请输入楼盘名称"> <button class="btn btn-primary btn-border btn-round" type="submit" onclick="selName()">搜索</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-sub">                 
+                        </div>
+                        <table class="layui-table" id="td">
+                            <thead>
+                                <tr>
+                                    <th scope="col">编号</th>
+                                    <th scope="col">楼盘名称</th>
+                                    <th scope="col">楼盘图片</th>
+                                    <th scope="col">价格</th>
+                                    <th scope="col">大小</th>
+                                    <th scope="col">户型名称</th>
+                                    <th scope="col">省</th>
+                                    <th scope="col">市</th>
+                                    <th scope="col">区</th>
+                                    <th scope="col">详细地址</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">具体信息</th>
+                                    <th scope="col">房子型号</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tr1">
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.H_Id</td>
+                                        <td>@item.H_Name</td>
+                                        <td>
+                                            <img src="@item.HImg" alt="Alternate Text" />
+                                        </td>
+                                        <td>@item.H_Price</td>
+                                        <td>@item.H_Size</td>
+                                        <td>@item.Apartment_Name</td>
+                                        <td>@item.Prov_Name</td>
+                                        <td>@item.City_Name</td>
+                                        <td>@item.Area_Name</td>
+                                        <td>@item.H_Address</td>
+                                        <td>
+                                            @if (item.H_State == 0)
+                                            {
+                                                <label>空房</label>
+                                            }
+                                            @if (item.H_State == 1)
+                                            {
+                                                <label>预约</label>
+                                            }
+                                            @if (item.H_State == 2)
+                                            {
+                                                <label>售出</label>
+                                            }
+
+                                        </td>
+                                        <td>@item.H_Detailed</td>
+                                        <td>@item.H_HomeType</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-border" onclick="showAll(@item.H_Id)" data-toggle="modal" data-target="#myModal">编辑</button>
+                                            <button class="btn btn-primary btn-border" onclick="DelHouseByID(@item.H_Id)">删除</button>
+                                            <button class="btn btn-primary btn-border" onclick="location.href='/Important/Contract/@(item.H_Id)'">出售</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <p style="text-align:right">
+                            <a href="javascript:page(1)">首页</a>
+                            <a href="javascript:page(@(ViewBag.Index-1))">上一页</a>
+                            @for (int i = 1; i <= ViewBag.Page; i++)
+                            {
+                                <a href="javascript:page(@i)">@i</a>
+                            }
+                            <a href="javascript:page(@(ViewBag.Index+1))">下一页</a>
+                            <a href="javascript:page(@ViewBag.Page)">尾页</a>
+                        </p>
+
+                        <!-- 按钮触发模态框 -->
+                        <!-- 模态框（Modal） -->
+                    </div>
+                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" style="position:absolute;margin-left:-400px;">
+                            <div class="modal-content" style="height:800px; width:650px;">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <div class="card-title">编辑楼盘信息如下👇</div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <input id="H_Id"  hidden/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="email">楼盘名称</label>
+                                                <input type="text" class="form-control" name="H_Name" id="txtname" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="password">户型名称</label>
+                                                <select name="Apartment_Id" id="Apartment_Id" lay-filter="aihao">
+                                                    <option>--请选择--</option>
+                                                    @foreach (var item in ViewData["type"] as List<Apartment>)
+                                                    {
+                                                        <option value="@item.Apartment_Id">@item.Apartment_Name</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-check">
+                                                <label>状态</label><br />
+                                                <label class="form-radio-label">
+                                                    <input class="form-radio-input" type="radio" id="H_S" name="H_State" value="0" checked="checked" />
+                                                    <span class="form-radio-sign">空房</span>
+                                                </label>
+                                                <label class="form-radio-label ml-3">
+                                                    <input class="form-radio-input" type="radio" id="H_S" name="H_State" value="1" />
+                                                    <span class="form-radio-sign">预约</span>
+                                                </label>
+                                                <label class="form-radio-label ml-3">
+                                                    <input class="form-radio-input" type="radio" id="H_S" name="H_State" value="2" />
+                                                    <span class="form-radio-sign">售出</span>
+                                                </label>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="password">价格</label>
+                                                <input type="text" class="form-control" name="H_Price" id="prices" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="password">大小</label>
+                                                <input type="text" class="form-control" name="H_Size" id="size" />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="password">房子型号</label>
+                                                <input type="text" id="types" name="H_HomeType" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="password">省 市 区</label>
+                                                <select name="Apartment_Id" id="Apartment_Id" lay-filter="aihao">
+                                                    <option>--请选择--</option>
+                                                    @foreach (var item in ViewData["type"] as List<Apartment>)
+                                                    {
+                                                        <option value="@item.Apartment_Id">@item.Apartment_Name</option>
+                                                    }
+                                                </select>
+                                                @Html.DropDownList("City_Id", new List<SelectListItem>())
+                                                @Html.DropDownList("Area_Id", new List<SelectListItem>())
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="password">楼盘具体信息</label>
+                                                <input type="text" id="infor" name="H_Detailed" class="form-control" />
+                                            </div>
+                                            <div class="card-body">
+                                                <label for="errorInput">详细地址</label>
+                                                <input type="text" id="addr" name="H_Address" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-left:50px">
+                                        <button type="submit" onclick="upthouses()" data-toggle="modal" class="btn btn-success">修改</button>
+                                    </div>
+                                </div>
+
+
+                            </div><!-- /.modal-content -->
+                        </div><!-- /.modal -->
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var pId;
+    var cId;
+    var aId;
+    $(function () {
+
+        showAll($("#H_Id").val());
+
+        ///绑定市
+        GetCity(pId);
+        ///绑定区
+        GetArea($("#City_Id").val());
+        $("#Prov_Id").change(function () {
+            GetCity($("#Prov_Id").val());
+        });
+        $("#City_Id").change(function () {
+            GetArea($("#City_Id").val());
+        });
+    });
+
+    //反填
+    function showAll(id) {
+
+        $.ajax({
+            async: false,
+            url: "/FYY/GetHouseByID/" + id,
+            type: 'get',
+            dataType: 'json',
+            success: function (data) {
+                $(data).each(function () {
+                    $("#H_Id").val(this.H_Id);
+                    $("#txtname").val(this.H_Name);
+                    $("#size").val(this.H_Size);
+                    $("#addr").val(this.H_Address);
+                    $("#prices").val(this.H_Price);
+
+                    if (this.H_State == 0) {
+                        $("#empty").attr('checked', true);
+                    }
+                    else {
+                        $("#empty").attr('checked', false);
+                    }
+                    if (this.H_State == 1) {
+                        $("#view").attr('checked', true);
+                    }
+                    else {
+                        $("#view").attr('checked', false);
+                    }
+                    if (this.H_State == 2) {
+                        $("#end").attr('checked', true);
+                    }
+                    else {
+                        $("#end").attr('checked', false);
+                    }
+                    pId = this.Prov_Id;
+                    cId = this.City_Id;
+                    aId = this.Area_Id;
+                    $("#infor").val(this.H_Detailed);
+                    $("#types").val(this.H_HomeType);
+                    $("#addr").val(this.H_Address);
+                    $("#Apartment_Id option").each(function () {
+                        if (data.Apartment_Id == $(this).val()) {
+                            $(this).prop("selected", true);
+                        }
+                    });
+
+                    $("#Prov_Id option").each(function () {
+                        if (data.Prov_Id == $(this).val()) {
+                            $(this).prop("selected", true);
+                        }
+                    });
+                    GetCity($("#Prov_Id").val());
+                    GetArea($("#City_Id").val())
+                });
+            }
+
+        });
+    }
+
+
+    ///绑定市
+    function GetCity(id) {
+        if (id == "") {
+            $("#City_Id").empty().append("<option value=''>-请选择市-</option>");
+            return;
+        }
+        $.ajax({
+            async: false,
+            type: "get",
+            url: '/FYY/BindCity/' + id,
+            dataType: "json",
+            success: function (data) {
+                //alert(data)
+                $("#City_Id").empty();
+                $(data).each(function () {
+                    if (this.City_Id == cId) {
+                        $("#City_Id").append("<option value='" + this.City_Id + "' selected>" + this.City_Name + "</option>");
+                    } else {
+                        $("#City_Id").append("<option value='" + this.City_Id + "'>" + this.City_Name + "</option>");
+                    }
+
+                });
+
+            }
+        });
+    }
+
+    ///绑定区
+    function GetArea(id) {
+        //alert(123445)
+        if (id == "") {
+            $("#Area_Id").empty().append("<option value=''>-请选择区-</option>");
+            return;
+        }
+        $.ajax({
+            async: false,
+            type: "get",
+            url: '/FYY/BindArea/' + id,
+            dataType: "json",
+            success: function (data) {
+                $("#Area_Id").empty();
+                $(data).each(function () {
+                    if (this.Area_Id == aId) {
+                        $("#Area_Id").append("<option value='" + this.Area_Id + "' selected>" + this.Area_Name + "</option>");
+                    } else {
+                        $("#Area_Id").append("<option value='" + this.Area_Id + "'>" + this.Area_Name + "</option>");
+                    }
+                });
+
+            }
+        });
+    }
+    function DelHouseByID(id) {
+        if (confirm('亲,确认要删除吗?') == true) {
+            $.ajax({
+                url: "/FYY/DelHouse/" + id,
+                dataType: "json",
+                success: function (data) {
+                    if (data > 0) {
+                        alert('哇塞,有一栋楼盘已消失了啦！');
+                        $("#" + id).remove();
+                        location.reload();
+                    }
+                    else {
+                        alert('抱歉, 有一栋楼盘已存在啦!');
+                    }
+                }
+
+
+            });
+
+        }
+    }
+    function upthouses() {
+        var o = new Object();
+        o.H_Id = $("#H_Id").val();
+        o.H_Name = $("#txtname").val();
+        o.H_Size = $("#size").val();
+        o.H_Address = $("#addr").val();
+        o.H_Price = $("#prices").val();
+        o.H_Detailed = $("#infor").val();
+        o.H_HomeType = $("#types").val();
+        o.hs = $("#H_S").val();
+        o.Apartment_Id = $("#Apartment_Id").val();
+        o.Prov_Id = $("#Prov_Id").val();
+        o.City_Id = $("#City_Id").val();
+        o.Area_Id = $("#Area_Id").val();
+        //        var results = {
+        //    H_Name: H_Name, H_Size: H_Size, H_Address: H_Address, H_Price: H_Price, H_Detailed: H_Detailed, H_State: hs,
+        //    H_HomeType: H_HomeType, H_Id: id, Apartment_Id: Apartment, Prov_Id: Prov_Id, City_Id: City_Id, Area_Id: Area_Id
+        //};
+        //console.log(results);
+        $.ajax({
+            url: "/FYY/UptHouseAction?h=" + JSON.stringify(o),
+            success: function (data) {
+                if (data > 0) {
+                    alert('哇塞,有一栋楼盘修改成功');
+                    location.reload();
+
+                }
+                else {
+                  alert('抱歉,有一栋楼盘修改失败啦!');
+                }
+            }
+
+        })
+
+   }
+
+    function selName() {
+        var names = $("#serachs").val();
+        $.ajax({
+            url: "/FYY/GetHouses?Name=" + names,
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $("#tr1").empty();
+                $(data).each(function () {
+                    var tr = "<tr>"
+                        + "<td>" + this.H_Id + "</td>"
+                        + "<td>" + this.H_Name + "</td>"
+                        + "<td><img src='"+this.HImg+"' alt='Alternate Text' /></td>"
+                        + "<td>" + this.H_Price + "</td>"
+                        + "<td>" + this.H_Size + "</td>"
+                        + "<td>" + this.Apartment_Name + "</td>"
+                        + "<td>" + this.Prov_Name + "</td>"
+                        + "<td>" + this.City_Name + "</td>"
+                        + "<td>" + this.Area_Name + "</td>"
+                        + "<td>" + this.H_Address + "</td>"
+                        + "<td>" + this.H_State + "</td > "
+                        + "<td>" + this.H_Detailed + "</td>"
+                        + "<td>" + this.H_HomeType + "</td>"
+                        + "<td><button class='btn btn-primary btn-border' data-toggle='modal' data-target='#myModal' onclick='showAll(" + this.H_Id + ")'> 编辑</td >"
+                        + "<td></button><button class='btn btn-primary btn-border' onclick='DelHouseByID(" + this.H_Id + ")'> 删除</button></td>"
+                        + "</tr>"
+                    $("#tr1").append(tr);
+                });
+            }
+
+        })
+    }
+
+    function page(index) {
+        if (index < 1 || index>@ViewBag.Page) {
+            return;
+        }
+        location.href = "/FYY/GetHouse?index=" + index;
+    }
+
+    function AddContr() {
+        layer.open({
+            type: 2,
+            closeBtn: false,
+            area: ['1000px', '750px'],
+            shift: 2,
+            shadeClose: true,
+            closeBtn: true,
+            content: "/Important/Contract"
+        });
+    }
+</script>
+

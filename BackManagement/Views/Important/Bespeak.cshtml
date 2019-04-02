@@ -1,0 +1,63 @@
+﻿
+@using Model
+@model List<Bespeak>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Tables - Ready Bootstrap Dashboard</title>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+    <link rel="stylesheet" href="~/template/twts_142_Ready/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="~/template/twts_142_Ready/assets/css/ready.css">
+    <link rel="stylesheet" href="~/template/twts_142_Ready/assets/css/demo.css">
+    <link href="~/Style/lib/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/Style/lib/layui/layui.js"></script>
+</head>
+<body>
+
+
+    <div id="divdata" style="margin-top:50px;">
+        @Html.Partial("_Bespeaksview", Model)
+    </div>
+    <div id="demo7" style="text-align:center"></div>
+    <script src="~/js/jquery-3.1.1.min.js"></script>
+    <script src="~/layui/layui.js"></script>
+    <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+    <script>
+        layui.use(['laypage', 'layer'], function () {
+            var laypage = layui.laypage
+                , layer = layui.layer;
+            //完整功能
+            laypage.render({
+                elem: 'demo7'
+               // (ViewBag.totalCount != null && ViewBag.totalCount > 10 ? ViewBag.totalCount : 0)
+                ,count: @ViewBag.totalCount
+                ,curr : '@(ViewBag.pageIndex)' || 1
+                , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+
+                //, limits: [1, 2, 3, 4, 5]
+                , jump: function (obj, first) {
+                    if (!first) {
+                        PageIndex = obj.curr;
+                        PageSize = obj.limit;
+                        $.ajax({
+                            url: "/Important/GetBespeaks/?pageIndex=" + PageIndex + "&pageSize=" + PageSize,
+                            type: "get",
+                            success: function (data) {
+                                $(data).each(function () {
+                                    $("#divdata").empty().append(data);
+                                })
+                            }
+                        })
+                    }
+                }
+            });
+    });
+    </script>
+</body>
+</html>

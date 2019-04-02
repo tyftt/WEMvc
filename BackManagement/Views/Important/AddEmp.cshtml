@@ -1,0 +1,133 @@
+﻿
+@{
+    Layout = null;
+}
+@model List<Model.Employee>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <script src="~/Style/static/js/jquery-1.10.2.js"></script>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <script src="~/Scripts/bootstrap.js"></script>
+    <link href="~/Style/lib/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/Style/lib/layui/layui.js"></script>
+    <link href="~/Content/calendar.css" rel="stylesheet" />
+    <script type="text/javascript" src="~/Scripts/calendar.js"></script>
+    <script type="text/javascript" src="~/Scripts/calendar-zh.js"></script>
+    <script type="text/javascript" src="~/Scripts/calendar-setup.js"></script>
+</head>
+<div class="content">
+    <div class="container-fluid" style="width:800px;margin:0 auto;margin-top:40px;">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="email">姓名</label>
+                            <input type="text" class="form-control" name="E_Name" id="E_Name" />
+                        </div>
+                        <div class="form-check">
+                            <label>性别</label><br />
+                            <label class="form-radio-label">
+                                <input class="form-radio-input" type="radio" id="E_Sex" name="E_Sex" value="1" checked="checked" />
+                                <span class="form-radio-sign">男</span>
+                            </label>
+                            <label class="form-radio-label ml-3">
+                                <input class="form-radio-input" type="radio" id="E_Sex" name="E_Sex" value="0" />
+                                <span class="form-radio-sign">女</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">年龄</label>
+                            <input type="text" class="form-control" name="E_Age" id="E_Age" />
+                        </div>
+                        <div class="card-body">
+                            <label for="successInput">身份证号</label>
+                            <input type="text" id="E_IDCard" name="E_IDCard" class="form-control" />
+                            <span id="pp" style="color:#ff0000"></span>
+                        </div>
+                        <div class="card-body">
+                            <label for="errorInput">家庭住址</label>
+                            <input type="text" id="E_Address" name="E_Address" class="form-control" />
+                        </div>
+                        <div class="card-body">
+                            <label for="exampleFormControlSelect1">职位</label>
+                            <select class="form-control" name="P_Id" id="P_Id">
+                                @foreach (var item in ViewBag.BingZW)
+                                {
+                                    <option value="@item.P_Id">@item.P_Name </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="card-body">
+                                选择时间：<input class="form-control" type="text" id="EntTime" name="E_StartTime" onclick="return showCalendar('EntTime', 'y-mm-dd');" />
+                    </div>
+                    <div class="card-body">
+                        <label for="errorInput">联系方式</label>
+                        <input type="text" id="E_Phone" name="E_Phone" class="form-control" />
+                        <span id="pone" style="color:#ff0000"></span>
+                    </div>
+
+                </div>
+                <div class="card-action" style="margin:0 auto;margin-top:40px;">
+                    <button type="button" onclick="AddUser()" class="btn btn-success">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    $("#successInput").blur(function () {
+        var E_IDCard = $(this).val();
+        // 身份证号码为15位或者18位，15位时全为数字，18位前17位为数字，最后一位是校验位，可能为数字或字符X
+        var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+        if (reg.test(E_IDCard) === false) {
+            $("#pp").text("身份证输入不合法");
+            return false;
+        }
+        else {
+
+            $("#pp").text("");
+        }
+    })
+
+    $("#PoneInput").blur(function () {
+        var E_Phone = $(this).val();
+        var reg = /^(\(\d{3,4}\)|\d{3,4}-)?\d{7,8}/;
+        if (reg.test(E_Phone) == false) {
+            $("#pone").text("电话号不正确!");
+            return false;
+        }
+        else {
+            $("#pone").text("");
+        }
+    })
+
+    //修改
+    function AddUser() {
+        var nmae = $("#E_Name").val();
+        var sex = $("#E_Sex").val();
+        var age = $("#E_Age").val();
+        var card = $("#E_IDCard").val();
+        var address = $("#E_Address").val();
+        var zhiwei = $("#P_Id option:selected").val();
+        var Rztime = $("#EntTime").val();
+        var Pone = $("#E_Phone").val();
+
+        var o = { E_Name: nmae, E_Sex: sex, E_Age: age, E_IDCard: card, E_Address: address, E_StartTime: Rztime, P_Id: zhiwei, E_Phone: Pone };
+        console.log(o);
+        $.ajax({
+            url: "/Important/AddEmp/?t=" + JSON.stringify(o),
+            dataType: "json",
+            type: "post",
+            success: function (data) {
+                if (data > 0) {
+                    alert("入职成功")
+                }
+            }
+        });
+    }
+</script>
+</html>

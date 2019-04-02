@@ -1,0 +1,265 @@
+﻿
+@{
+    ViewBag.Title = "EmpShow";
+    Layout = null;
+}
+<link href="~/Style/static/css/font.css" rel="stylesheet" />
+<link href="~/Style/static/css/weadmin.css" rel="stylesheet" />
+<link href="~/Style/lib/layui/css/layui.css" rel="stylesheet" />
+<link href="~/Style/lib/layui/css/layui.mobile.css" rel="stylesheet" />
+<script src="~/Style/lib/layui/layui.js"></script>
+<script src="~/Style/lib/layui2.0.2/layui.js"></script>
+<script src="~/Style/static/js/jquery-1.10.2.js"></script>
+<script src="~/Style/static/js/bootstrap.js"></script>
+<link href="~/Style/static/css/bootstrap.css" rel="stylesheet" />
+<script src="~/Style/lib/layui/layui.all.js"></script>
+@model List<Model.Employee>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <input type="text" style="width:400px; display:inline-block" class="form-control" id="Ename" placeholder="输入姓名">
+                            
+                            <button class="btn btn-primary btn-border btn-round" type="submit" onclick="SelectName()" style="width:100px;">查询</button>
+                        </div>
+                    </div>
+                    @*<div class="layui-form">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label">中文版</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" class="layui-input" id="test1" placeholder="yyyy-MM-dd">
+                                </div>
+                            </div>
+                        </div>
+                    </div>*@
+                    <div class="card-body">
+
+                        <table class="layui-table" lay-size="sm" id="td">
+                            <thead>
+                                <tr>
+                                    <th scope="col">姓名</th>
+                                    <th scope="col">性别</th>
+                                    <th scope="col">年龄</th>
+                                    <th scope="col">身份证号</th>
+                                    <th scope="col">家庭住址</th>
+                                    <th scope="col">入职日期</th>
+                                    <th scope="col">离职日期</th>
+                                    <th scope="col">职位</th>
+                                    <th scope="col">联系方式</th>
+                                    <th scope="col">操作</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tr1">
+                                @foreach (var item in Model)
+                                {
+                                    <tr id="@item.E_Id">
+                                        <td>@item.E_Name</td>
+                                        <td>@(item.E_Sex.ToString() == "1" ? "男" : "女")</td>
+                                        <td>@item.E_Age</td>
+                                        <td>@item.E_IDCard</td>
+                                        <td>@item.E_Address</td>
+                                        <td>@item.E_StartTime</td>
+                                        <td>@item.E_EndTime</td>
+                                        <td>@item.P_Name</td>
+                                        <td>@item.E_Phone</td>
+                                        <td>
+                                            <button data-method="notice" class="layui-btn" onclick="fantian(@item.E_Id)">修改</button>
+
+                                        </td>
+                                        <td> <button class="btn btn-primary btn-border" onclick="del(@item.E_Id)">删除</button></td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+
+                        <!-- 按钮触发模态框 -->
+                        <!-- 模态框（Modal） -->
+                    </div>
+                 
+                </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+   
+    //修改
+    function upt() {
+        var id = $("#id").val();
+        var nmae = $("#E_Name").val();
+        var sex = $("#E_Sex").val();
+        var age = $("#E_Age").val();
+        var card = $("#successInput").val();
+        var address = $("#errorInput").val();
+        var zhiwei = $("#P_Id option:selected").val();
+        var Rztime = $("#StartTime").val();
+        var Pone = $("#PoneInput").val();
+        var o = { E_Name: nmae, E_Sex: sex, E_Age: age, E_IDCard: card, E_Address: address, E_StartTime: Rztime, P_Id: zhiwei, E_Phone: Pone, E_Id: id };
+        console.log(o);
+        $.ajax({
+            url: "/TYF/uptEmp/?emp=" + JSON.stringify(o),
+            dataType: "json",
+            type: "post",
+            success: function (data) {
+                if (data > 0) {
+                    alert('修改成功');
+                    SelectName();
+                }
+            }
+        });
+    }
+    //删除
+ 
+    //查询
+    function SelectName() {
+        var name = $("#Ename").val();
+        $.ajax({
+            url: "http://localhost:23634/api/Emp/SShow/?Ename=" + name,
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $("#tr1").empty();
+                $(data).each(function () {
+                    var tr = "<tr>"
+                        + "<td>" + this.E_Name + "</td>"
+                        + "<td>" + (this.E_Sex== "1" ? "男":"女")+"</td>"
+                        + "<td>" + this.E_Age + "</td>"
+                        + "<td>" + this.E_IDCard + "</td>"
+                        + "<td>" + this.E_Address + "</td>"
+                        + "<td>" + this.E_StartTime + "</td>"
+                        + "<td>" + this.E_EndTime + "</td>"
+                        + "<td>" + this.P_Name + "</td>"
+                        + "<td>" + this.E_Phone + "</td>"
+                        + "<td><button data-method='notice' class='layui-btn' onclick='fantian("+ this.E_Id +")'>修改</button></td >"
+                        + "<td></button><button class='btn btn-primary btn-border' onclick='del(" + this.E_Id + ")'> 删除</button></td>"
+                        + "</tr>"
+                    $("#tr1").append(tr);
+                });
+            }
+
+        })
+    }
+    $("#successInput").blur(function () {
+        var E_IDCard = $(this).val();
+        // 身份证号码为15位或者18位，15位时全为数字，18位前17位为数字，最后一位是校验位，可能为数字或字符X
+        var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+        if (reg.test(E_IDCard) === false) {
+            $("#pp").text("身份证输入不合法");
+            return false;
+        }
+        else {
+
+            $("#pp").text("");
+        }
+    })
+
+    $("#PoneInput").blur(function () {
+        var E_Phone = $(this).val();
+        var reg = /^(\(\d{3,4}\)|\d{3,4}-)?\d{7,8}/;
+        if (reg.test(E_Phone) == false) {
+            $("#pone").text("电话号不正确!");
+            return false;
+        }
+        else {
+            $("#pone").text("");
+        }
+    })
+
+</script>
+<script>
+
+    function fantian (id){
+                //示范一个公告层
+                layer.open({
+                    type: 1
+                    , title: false //不显示标题栏
+                    , closeBtn: false
+                    ,area: ['70%', '450px']
+                    , shade: 0.1
+                    , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                    , btn: ['修改', '取消']
+                    , btnAlign: 'c'
+                    , moveType: 1 //拖拽模式，0或者1
+                    , content: '<table><tr><label id="id"  hidden="hidden" ><td><br/></td><td></td></tr><tr><input type="text" id="PoneInput" name="E_Name" class="form-control" style="margin-top:20px" placeholder="姓名"  /></tr> <tr> <td> <br /> </td> </tr><tr><select class="form-control" id="E_Sex_"  style="margin-top:20px"><option value="">性别</option> <option value="1">男</option><option value="0">女</option></select> </tr><tr><input type="text" id="E_Age" name="E_Age"  class="form-control" style="margin-top:20px" placeholder="年龄" style="margin-top:20px"/></tr> <tr><input type="text" id="E_IDCard" name="E_IDCard" class="form-control"  placeholder="身份证号"  class="form-control"  style="margin-top:20px"/> </tr><tr><input type="text" id="E_Address" name="E_Address" class="form-control"  placeholder="家庭住址" style="margin-top:20px"/></tr><tr><select class="form-control" id="P_Id" style="margin-top:20px"><option value="">职位</option>   @foreach (var item in ViewBag.BingZW)  { <option value="@item.P_Id">@item.P_Name </option>} </select></tr><tr><input class="form-control" type="text" id="E_StartTime" name="E_StartTime" onclick="return showCalendar("EntTime", "y-mm-dd");" placeholder="入职日期" style="margin-top:20px" class="layui-input" /></tr><tr><input type="text" id="E_Phone" name="E_Phone" class="form-control" placeholder="联系方式" style="margin-top:20px" /></tr></table>'
+                    , success: function (layero) {
+                        $.ajax({
+                            url: "/Important/FantianShow/?id=" + id,
+                            type: "get",
+                            dataType: "json",
+                            async: "true",
+                            success: function (data) {
+                                $("#id").val(id);
+                                $("[name='E_Name']").val(data.E_Name);
+
+                                $("#E_Sex_ option").each(function () {
+                                    if (data.E_Sex == $(this).val()) {
+                                        $(this).prop("selected", true);
+
+                                    }
+                                });
+                                $("[name='E_Age']").val(data.E_Age);
+                                $("#E_IDCard").val(data.E_IDCard);
+                                $("#E_Address").val(data.E_Address);
+
+                                $("#P_Id option").each(function () {
+                                    if (data.P_Id == $(this).val()) {
+                                        $(this).prop("selected", true);
+
+                                    }
+                                })
+                                $("#E_StartTime").val(data.E_StartTime);
+                                $("#E_Phone").val(data.E_Phone);
+                            }
+                               
+                        })
+                    }
+                    , yes() {
+                        var E_Id = $("#id").val();
+                        var nmae = $("[name='E_Name']").val();
+                        var sex = $("#E_Sex_").val();
+                        var age = $("[name='E_Age']").val();
+                        var card = $("#E_IDCard").val();
+                        var address = $("#E_Address").val();
+                        var zhiwei = $("#P_Id option:selected").val();
+                        var Rztime = $("#E_StartTime").val();
+                        var Pone = $("#E_Phone").val();
+                        var o = { E_Name: nmae, E_Sex: sex, E_Age: age, E_IDCard: card, E_Address: address, E_StartTime: Rztime, P_Id: zhiwei, E_Phone: Pone, E_Id: E_Id };
+                        $.ajax({
+                            url: "/Important/uptEmp/?emp=" + JSON.stringify(o),
+                            dataType: "json",
+                            type: "post",
+                            success: function (data) {
+                                if (data > 0) {
+                                    SelectName();
+                                    layer.msg('修改成功');
+                                }
+                            }
+                        });
+                    },
+                    btn2() {
+
+                    }
+                });
+    }
+    function del(id) {
+        if (confirm('确认删除吗?')) {
+            $.ajax({
+                url: "http://localhost:23634/api/Emp/Dell/?id=" + id,
+                dataType: "json",
+                type: "post",
+                success: function (data) {
+                    if (data > 0) {
+                        SelectName();
+                    }
+                }
+
+            });
+        }
+    }
+</script>

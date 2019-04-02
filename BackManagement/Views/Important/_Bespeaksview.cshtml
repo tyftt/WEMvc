@@ -1,0 +1,52 @@
+﻿
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<table class="layui-table">
+    <thead>
+        <tr>
+
+            <th scope="col">客户姓名</th>
+            <th scope="col">手机号</th>
+            <th scope="col">预约时间</th>
+            <th scope="col">预约看房时间</th>
+            <th scope="col">房子名称</th>
+            <th scope="col">房子地址</th>
+            <th scope="col">操作</th>
+        </tr>
+    </thead>
+    <tbody id="tbodyEnterprise">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.U_Name</td>
+                <td>@item.U_Phone</td>
+                <td>@item.B_Time</td>
+                <td>@item.B_ShowingTime</td>
+                <td>@item.H_Name</td>
+                <td>@item.H_Address</td>
+                <td>
+                    @if (item.B_State == 1)
+                    {
+                        <span>已接待</span>
+                        <a onclick="Del(@item.B_Id)">删除</a>
+                    }
+                    else
+                    {
+                        @Html.ActionLink("接待", "DelBespeak", new { id = item.B_Id })
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    function Del(id) {
+        $.ajax({
+            url: "http://localhost:23634/api/Future_k/Del/?id=" + id,
+            type: "get",
+            success: function (data) {
+                location.href = "/Important/Bespeak";
+            }
+        })
+    }
+</script>
+

@@ -1,0 +1,113 @@
+﻿
+@{
+    Layout = null;
+}
+@model List<Model.HouseInfo>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/Style/static/js/echarts/echarts.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+
+    <div>
+        <div style="width:500px;height:100px; margin-left:400px;">
+            <span id="timee" style="font-size:50px"></span>
+        </div>
+        <div id="main" style="width: 400px;height:300px;float:left; margin-left:100px;">
+        </div>
+        <div id="bing" style="width: 400px;height:300px; float:right; margin-right:100px;"></div>
+    </div>
+
+    <script type="text/javascript">
+
+        var myDate = new Date();
+        var mouth = myDate.getMonth() + 1;
+        var year = myDate.getFullYear() + "年" + mouth + "月份销量";
+
+        //数组存入
+        var fName = [];
+        var fCount = [];
+        var DataInfo = [];
+
+        //加载
+        name();
+        function name() {
+            $("#timee").append(year);
+            $.ajax({
+                url: "/Important/GetDataInfo",
+                type: "get",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    $(data).each(function () {
+                        fName.push(this.Apartment_Name);
+                        fCount.push(this.number);
+                        var o = new Object();
+                        o.value = this.number;
+                        o.name = this.Apartment_Name;
+                        DataInfo.push(o);
+                    })
+                }
+            })
+        }
+
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        //饼状图
+        var BingChart = echarts.init(document.getElementById('bing'));
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: "",
+            },
+            tooltip: {},
+            legend: {
+                data: "",
+            },
+            xAxis: {
+                data: fName
+            },
+            yAxis: {},
+            series: [{
+                name: '销量',
+                type: 'bar',
+                data: fCount
+            }]
+        };
+        // 使用刚指定的配置项和数据显示图表。
+
+        myChart.setOption(option);
+        option = {
+            series: [
+                {
+                name: '访问来源',
+                    type: 'pie',
+                    radius: '55%',
+                    data: DataInfo,
+                   roseType: 'angle',
+                    itemStyle: {
+                    normal: {
+                        shadowBlur: 200,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                }
+            }
+            ]
+        };
+
+
+        // 使用刚指定的配置项和数据显示图表。
+        BingChart.setOption(option);
+
+
+    </script>
+</body>
+</html>
+

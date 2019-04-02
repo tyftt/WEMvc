@@ -1,0 +1,64 @@
+﻿@{
+    Layout = null;
+}
+@model List<Model.Sale>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/Style/static/js/echarts/echarts.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div>员工当月销售</div>
+    <div id="main" style="width: 400px;height:500px; margin-left:100px"></div>
+
+    <script type="text/javascript">
+
+
+        var Name = [];
+        var count = [];
+        Zhexian();
+        function Zhexian() {
+            $.ajax({
+                url: "/Important/ZheLine",
+                type: "get",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+
+                    $(data).each(function () {
+                        Name.push(this.E_Name);
+                        count.push(this.num);
+                    })
+                }
+            })
+        }
+
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        option = {
+            xAxis: {
+                type: 'category',
+                data: Name,
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: count,
+                type: 'line'
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+
+
+    </script>
+</body>
+</html>

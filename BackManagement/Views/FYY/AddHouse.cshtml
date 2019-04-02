@@ -1,0 +1,408 @@
+﻿<script src="~/Scripts/jquery-1.8.2.min.js"></script>
+<link href="~/Content/webuploader.css" rel="stylesheet" />
+<script src="~/Scripts/webuploader.js"></script>
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/style.css" rel="stylesheet" />
+<link href="~/Content/demo.css" rel="stylesheet" />
+<link href="~/Content/font-awesome.css" rel="stylesheet" />
+<link href="~/Content/bootstrap-theme.css" rel="stylesheet" />
+<link href="~/Style/lib/layui/css/layui.css" rel="stylesheet" />
+<script src="~/Style/lib/layui/layui.js"></script>
+@{
+    ViewBag.Title = "添加楼盘信息";
+    Layout = null;
+}
+@using Model;
+@model List<Model.HouseInfo>
+<div class="content">
+    <div style="position:relative;left:110px;top:500px;">
+
+    </div>
+    <form class="layui-form">
+        <div class="layui-form-item">
+
+            <label class="layui-form-label">楼盘名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="H_Name" id="H_Name" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">户型名称</label>
+                <div class="layui-input-block">
+                    <select name="Apartment_Id" id="Apartment_Id" lay-filter="aihao">
+                        <option>--请选择--</option>
+                        @foreach (var item in ViewData["type"] as List<Apartment>)
+                        {
+                            <option value="@item.Apartment_Id">@item.Apartment_Name</option>
+                        }
+                    </select>
+                </div> @*@Html.DropDownList("Apartment_Id", ViewData["type"] as IEnumerable<SelectListItem>, "请选择户型")*@
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="H_State" value="0" title="" checked="checked">
+                    <label style="margin-left:-30px;">空房</label>
+                    <input type="radio" name="H_State" value="1" title="">
+                    <label style="margin-left:-30px;">预约</label>
+                    <input type="radio" name="H_State" value="2" title="">
+                    <label style="margin-left:-30px;">售出</label>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">价格</label>
+                <div class="layui-input-block">
+                    <input type="text" name="H_Price" id="H_Price" lay-verify="title" autocomplete="off" placeholder="请输入价格" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">大小</label>
+                <div class="layui-input-block">
+                    <input type="text" name="size" id="H_Size" lay-verify="title" autocomplete="off" placeholder="请输入房子大小" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">房子型号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="H_HomeType" id="H_HomeType" lay-verify="title" autocomplete="off" placeholder="请输入型号" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">楼盘具体信息</label>
+                <div class="layui-input-block">
+                    <input type="text" name="H_Detailed" id="H_Detailed" lay-verify="title" autocomplete="off" placeholder="请输入详细信息" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">地址</label>
+                <div class="layui-input-block">
+                    <select id="Prov_Id" name="Prov_Id" lay-filter="Prov_Id">
+                        <option value="">请选择</option>
+                        @foreach (var item in ViewBag.prov)
+                        {
+                            <option value="@item.Prov_Id">@item.Prov_Name</option>
+                        }
+                    </select>
+                    <select id="City_Id" name="City_Id" lay-filter="City_Id"></select>
+                    <select id="Area_Id" name="Area_Id"></select>
+                    @*@Html.DropDownList("Prov_Id", ViewBag.prov as IEnumerable<SelectListItem>, "-请选择省-")*@
+                    @*@Html.DropDownList("City_Id", new List<SelectListItem>())
+                        @Html.DropDownList("Area_Id", new List<SelectListItem>())*@
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">详细地址</label>
+                <div class="layui-input-block">
+                    <input type="text" name="H_Address" id="H_Address" lay-verify="title" autocomplete="off" placeholder="请输详细地址" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+
+                <table class="tc_table_cp" border="0">
+                    <tr>
+                        <td width="104">图片上传：</td>
+                        <td colspan="3">
+                            <div id="fileList">
+
+                            </div>
+                            <div class="cp_img_jia" id="filePicker"></div>
+                            <input type="hidden" name="imgInfo" id="imgInfo" value="" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo" type="button">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+
+
+</div>
+
+<script>
+    var imgArr = [];
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            var arr = [];
+            for (var i = 0; i < imgArr.length; i++) {
+                arr.push(imgArr[i].filePath);
+            }
+            data.field.imgInfo = JSON.stringify(arr);
+            $.ajax({
+                url: "/FYY/AddHouse",
+                data: data.field,
+                type: "post",
+                success: function (data) {
+                    layer.msg('添加成功');
+
+                }
+            })
+        })
+
+
+
+        form.on('select(Prov_Id)', function (data) {
+
+            ///绑定市
+            GetCity(data.value);
+            form.render();
+        })
+        form.on('select(City_Id)', function (data) {
+
+            ///绑定市
+            GetArea(data.value);
+            form.render();
+        })
+
+        ///绑定区
+        //GetArea($("#City_Id").val());
+        /////省点击事件
+        //form
+        //$("#Prov_Id").change(function () {
+        //    GetCity($(this).val());
+        //    //alert($("#City_Id").val());
+        //    GetArea($("#City_Id").val());
+        //});
+        /////市点击事件
+        //$("#City_id").change(function () {
+        //    GetArea($(this).val());
+        //});
+    });
+
+
+
+    ///三级联动
+
+    ///绑定市
+    function GetCity(id) {
+        if (id == "") {
+            $("#City_Id").empty().append("<option value=''>-请选择市-</option>");
+            return;
+        }
+        $.ajax({
+            async: false,
+            type: "get",
+            url: 'BindCity/' + id,
+            dataType: "json",
+            success: function (data) {
+                //alert(data)
+                $("#City_Id").empty();
+                $(data).each(function () {
+                    $("#City_Id").append("<option value='" + this.City_Id + "'>" + this.City_Name + "</option>");
+                });
+
+            }
+        });
+    }
+
+    ///绑定区
+    function GetArea(id) {
+        //alert(123445)
+        if (id == "") {
+            $("#Area_Id").empty().append("<option value=''>-请选择区-</option>");
+            return;
+        }
+        $.ajax({
+            async: false,
+            type: "get",
+            url: '/FYY/BindArea/' + id,
+            dataType: "json",
+            success: function (data) {
+                $("#Area_Id").empty();
+                $(data).each(function () {
+                    $("#Area_Id").append("<option value='" + this.Area_Id + "'>" + this.Area_Name + "</option>");
+                });
+
+            }
+        });
+    }
+
+
+    if ($("#txtname") == "") {
+        alert('楼盘不能为空');
+    }
+
+    ///判断Radio按钮是否选中
+    $("#btnsub").click(function () {
+        var list = $('input:radio[name="E_State"]:checked').val();
+        if (list == null || list == "" || list == undefined) {
+            return false;
+        }
+        else {
+            return list;
+        }
+    });
+    if ($("#prices") == "") {
+        alert('价格不能为空');
+    }
+
+    if ($("#size") == "") {
+        alert('房子大小不能为空!');
+    }
+    if ($("#infor") == "") {
+        alert('楼盘具体信息不能为空!');
+    }
+    if ($("#addr") == "") {
+        alert('详细地址不能为空!');
+    }
+    if ($("#types") == "") {
+        alert('房子型号不能为空!');
+    }
+    var applicationPath = window.applicationPath === "" ? "" : window.applicationPath || "../../";
+    $(function () {
+        var $ = jQuery,
+            $list = $('#fileList'),
+            // 优化retina, 在retina下这个值是2
+            ratio = window.devicePixelRatio || 1,
+            // 缩略图大小
+            thumbnailWidth = 90 * ratio,
+            thumbnailHeight = 90 * ratio,
+
+            // Web Uploader实例
+            uploader;
+        uploader = WebUploader.create({
+            // 选完文件后，是否自动上传。
+            auto: true,
+            disableGlobalDnd: true,
+            // swf文件路径
+            swf: applicationPath + '/Script/Uploader.swf',
+
+            // 文件接收服务端。
+            server: applicationPath + '/FYY/UpLoadProcess',
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#filePicker',
+
+            //只允许选择图片
+            accept: {
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/*'
+            }
+        });
+
+        // 当有文件添加进来的时候
+        uploader.on('fileQueued', function (file) {
+            var $li = $(
+                '<div id="' + file.id + '" class="cp_img">' +
+                '<img>' +
+                '<div class="cp_img_jian"></div></div>'
+            ),
+                $img = $li.find('img');
+
+
+            // $list为容器jQuery实例
+            $list.append($li);
+
+            // 创建缩略图
+            // 如果为非图片文件，可以不用调用此方法。
+            // thumbnailWidth x thumbnailHeight 为 100 x 100
+            uploader.makeThumb(file, function (error, src) {
+                if (error) {
+                    $img.replaceWith('<span>不能预览</span>');
+                    return;
+                }
+
+                $img.attr('src', src);
+            }, thumbnailWidth, thumbnailHeight);
+        });
+
+        // 文件上传过程中创建进度条实时显示。
+        uploader.on('uploadProgress', function (file, percentage) {
+            var $li = $('#' + file.id),
+                $percent = $li.find('.progress span');
+
+            // 避免重复创建
+            if (!$percent.length) {
+                $percent = $('<p class="progress"><span></span></p>')
+                    .appendTo($li)
+                    .find('span');
+            }
+
+            $percent.css('width', percentage * 100 + '%');
+        });
+
+        // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+        uploader.on('uploadSuccess', function (file, response) {
+            imgArr.push({
+                id: response.id,
+                filePath: response.filePath
+            });
+            $('#' + file.id).addClass('upload-state-done');
+        });
+
+        // 文件上传失败，显示上传出错。
+        uploader.on('uploadError', function (file) {
+            var $li = $('#' + file.id),
+                $error = $li.find('div.error');
+
+            // 避免重复创建
+            if (!$error.length) {
+                $error = $('<div class="error"></div>').appendTo($li);
+            }
+
+            $error.text('上传失败');
+        });
+
+        // 完成上传完了，成功或者失败，先删除进度条。
+        uploader.on('uploadComplete', function (file) {
+            $('#' + file.id).find('.progress').remove();
+        });
+
+        //所有文件上传完毕
+        uploader.on("uploadFinished", function () {
+            //提交表单
+
+        });
+
+        ////开始上传
+        $("#ctlBtn").click(function () {
+            alert();
+            uploader.upload();
+            var arr = [];
+            for (var i = 0; i < imgArr.length; i++) {
+                arr.push(imgArr[i].filePath);
+            }
+            var img = JSON.stringify(arr);
+
+            $("#imgInfo").val(img);
+        });
+
+        //显示删除按钮
+        $(".cp_img").live("mouseover", function () {
+            $(this).children(".cp_img_jian").css('display', 'block');
+
+        });
+        //隐藏删除按钮
+        $(".cp_img").live("mouseout", function () {
+            $(this).children(".cp_img_jian").css('display', 'none');
+
+        });
+        //执行删除方法
+        $list.on("click", ".cp_img_jian", function () {
+            var Id = $(this).parent().attr("id");
+            uploader.removeFile(uploader.getFile(Id, true));
+            $(this).parent().remove();
+            for (var i = 0; i < imgArr.length; i++) {
+                if (imgArr[i].id == Id) {
+                    imgArr.splice(i, 1);
+                }
+            }
+        });
+
+    });
+</script>

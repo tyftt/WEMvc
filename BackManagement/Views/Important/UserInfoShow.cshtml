@@ -1,0 +1,102 @@
+﻿@using Model
+@model List<Model.Consumption>
+@{
+    ViewBag.Title = "";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="~/Style/lib/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/Style/lib/layui/layui.js"></script>
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/Style/static/js/bootstrap.js"></script>
+
+    <link href="~/Style/static/css/bootstrap.css" rel="stylesheet" />
+</head>
+<body>
+    <div style="margin-top:10px;">
+        <div class="form-group" style="float:left">
+            <input type="text" id="Name" class="form-control input-pill" placeholder="客户姓名" style="width:600px;">
+
+        </div>
+        <div style="float:left;margin-left:10px;">
+            <button class="btn btn-simple-warning" style="width:100px;" onclick="SelUser()">查询</button>
+        </div>
+    </div>
+    <div id="divdata" style="margin-top:10px;">
+        @Html.Partial("_parUser", Model)
+    </div>
+    <div id="demo7" style="text-align:center"></div>
+    <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+    <script>
+        layui.use(['laypage', 'layer'], function () {
+            var laypage = layui.laypage
+                , layer = layui.layer;
+            //完整功能
+            laypage.render({
+                elem: 'demo7'
+               // (ViewBag.totalCount != null && ViewBag.totalCount > 10 ? ViewBag.totalCount : 0)
+                ,count: @ViewBag.totalCount
+                ,curr : '@(ViewBag.pageIndex)' || 1
+                , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+
+                //, limits: [1, 2, 3, 4, 5]
+                , jump: function (obj, first) {
+                    if (!first) {
+                        PageIndex = obj.curr;
+                        PageSize = obj.limit;
+                        $.ajax({
+                            url: "/Important/UserShow/?pageIndex=" + PageIndex + "&pageSize=" + PageSize,
+                            type: "get",
+                            success: function (data) {
+                                $(data).each(function () {
+                                    $("#divdata").empty().append(data);
+                                })
+                            }
+                        })
+                    }
+                }
+            });
+        });
+
+        //    //调用分页
+        //    laypage.render({
+        //        elem: 'demo20'
+        //        , count: data.length
+        //        , jump: function (obj) {
+        //            //模拟渲染
+        //            document.getElementById('biuuu_city_list').innerHTML = function () {
+        //                var arr = []
+        //                    , thisData = data.concat().splice(obj.curr * obj.limit - obj.limit, obj.limit);
+        //                layui.each(thisData, function (index, item) {
+        //                    arr.push('<li>' + item + '</li>');
+        //                });
+        //                return arr.join('');
+        //            }();
+        //        }
+        //    });
+        function SelUser() {
+            var name = $("#Name").val();
+            $.ajax({
+                url: "/Important/UserShow/?Name=" + name,
+                type: "get",
+                success: function (data) {
+                    $(data).each(function () {
+                        $("#divdata").empty().append(data);
+                    })
+                }
+            })
+        }
+    </script>
+
+</body>
+</html>
+
